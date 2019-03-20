@@ -1,4 +1,6 @@
 const inquirer = require("inquirer");
+const clipboardy = require("clipboardy");
+var request = require("request");
 
 inquirer
   .prompt([
@@ -54,6 +56,10 @@ inquirer
       envURL = "int-sso.";
     }
 
+    client_id = answers.client_id;
+    user_id = answers.user_id;
+    MD_API_KEY = answers.MD_API_KEY;
+
     console.log(
       (cURL =
         "curl -i https://" +
@@ -80,16 +86,26 @@ inquirer
         {
           type: "list",
           name: "send",
-          message: "Would you like to send or copy to clipboard?",
-          choices: ["Send", "Copy"]
+          message: "Create Session?",
+          choices: ["Yes", "No"]
         }
       ])
 
       .then(answers => {
-        if (answers.send === "Send") {
-          console.log("sent");
-        } else {
-          console.log(cURL);
+        if (answers.send === "Yes") {
+          let options = {
+            method: "GET",
+            url: `https://${envURL}moneydesktop.com/${client_id}/users/${user_id}/api_token.xml`,
+            headers: {
+              "MD-API-KEY": MD_API_KEY,
+              Accept: "application/vnd.moneydesktop.sso.v3+json"
+            }
+          };
+
+          request(options, function(error, response, body) {
+            if (error) throw new Error(error);
+            console.log(body);
+          });
         }
       });
   });
