@@ -19,6 +19,8 @@ inquirer
     }
   });
 
+
+  
 function createSession() {
   inquirer
     .prompt([
